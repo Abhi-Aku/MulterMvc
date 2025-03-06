@@ -9,8 +9,9 @@ const App = () => {
 
   const handleChange = (event) => {
     const { name, value, files } = event.target;
+
     if (name === 'file') {
-      setFormData({ ...formData, file: files[0] });
+      setFormData({ ...formData, file: files[0] }); // Ensuring only a single file is selected
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -18,20 +19,24 @@ const App = () => {
 
   const handleEvent = async (event) => {
     event.preventDefault();
+
+    if (!formData.file) {
+      alert('Please select an image file before submitting.');
+      return;
+    }
+
     const dataToBeSent = new FormData();
-    dataToBeSent.append('name', formData.name); 
+    dataToBeSent.append('name', formData.name);
     dataToBeSent.append('image', formData.file);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/image/posts', dataToBeSent, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      alert('Image uploaded successfully!');
-      console.log('Response data:', response.data);
+      const response = await axios.post('http://localhost:4000/api/student', dataToBeSent);
+      alert('Image uploaded successfully!'); 
+      console.log('Response:', response.data);  
+      setFormData({ name: '', file: null });
     } catch (err) {
-      console.error('Error occurred:', err);
+      console.error('Error occurred while uploading:', err);
+      
     }
   };
 
@@ -55,7 +60,7 @@ const App = () => {
 
         <div>
           <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-1">
-            File
+            Upload Image
           </label>
           <input
             type="file"
